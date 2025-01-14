@@ -2,9 +2,22 @@
 
 import math
 import sys
+import csv
 
+def parser():
+    with open('105demography_data.csv', newline='') as csvfile:
+        reader = csv.reader(csvfile)
+        for row in reader:
+            print(', '.join(row))
+
+def printer():
+    if sys.argv[1] == "-h":
+        print("USAGE\n    ./105demography [code]+\n\nDESCRIPTION\n    code    country code")
+    exit
 
 def main():
+    printer()
+    parser()
     x_list = [1, 2, 3, 4, 5]
     y_list = [5, 4, 3, 2, 1]
     n = len(x_list)
