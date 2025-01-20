@@ -3,32 +3,22 @@
 import math
 import sys
 import csv
+import string
 
 def parser():
+    buffer = []
     with open('105demography_data.csv', newline='') as csvfile:
         reader = csv.reader(csvfile)
         for row in reader:
-            print(', '.join(row))
-        return reader
-
-def printer():
-    if sys.argv[1] == "-h":
-        print("USAGE\n    ./105demography [code]+\n\nDESCRIPTION\n    code    country code")
-    exit
+            buffer.append(row)
+        return buffer
 
 def main():
-    printer()
     reader = parser()
-    i = 0
-    j = 0
+    
     n = 59
     x_list = [1, 2, 3, 4, 5]
-    y_list = [] * n
-    while reader != "\n":
-        while reader != ';':
-            y_list[j]
-        j+=1
-
+    y_list = [5, 4, 3, 2, 1]
 
     sum_X = sum(x_list)
     sum_Y = sum(y_list)
@@ -39,7 +29,7 @@ def main():
     a = (sum_XY - sum_X * sum_Y) / (sum_XX - (sum_X)**2)
     b = (sum_Y - (a * sum_X)) / n
 
-    Y_pred = []*n
+    Y_pred = []* n
     for x in x_list:
         Y_pred.append(x*a + b)
 
@@ -53,7 +43,6 @@ def main():
     print(sum_YY)
     print(sum_XY)
     print(RMSD)
-
 
 if __name__ == "__main__":
     main()
