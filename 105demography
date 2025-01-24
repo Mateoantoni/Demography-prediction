@@ -97,20 +97,21 @@ def main():
 
 
     print(
-        f"Fit 1\n"
+        f"Fit1\n"
         f"    Y = {aX:.2f} X {'+' if bX >= 0 else '-'} {abs(bX):.2f}\n"
         f"    Root-mean-square deviation: {RMSD_x:.2f}\n"
         f"    Population in 2050: {Y_estim:.2f}"
     )
 
     print(
-        f"Fit 2\n"
-        f"    Y = {aY:.2f} X {'+' if bY >= 0 else '-'} {abs(bY):.2f}\n"
+        f"Fit2\n"
+        f"    X = {aY:.2f} Y {'+' if bY >= 0 else '-'} {abs(bY):.2f}\n"
         f"    Root-mean-square deviation: {RMSD_y:.2f}\n"
         f"    Population in 2050: {X_estim:.2f}"
     )
 
     print(f"Correlation: {Correlation:.4f}")
+    return 0
 
 if __name__ == "__main__":
     main()
