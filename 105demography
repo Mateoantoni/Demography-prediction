@@ -1,0 +1,116 @@
+#!/usr/bin/env python3
+
+import math
+import sys
+import csv
+
+def parser() -> list[dict]:
+    with open('105demography_data.csv', newline='') as csvfile:
+        reader = csv.DictReader(csvfile, delimiter=";")
+        buffer = list(reader)
+    return buffer
+
+def calculate_RMSD_X(x_list, y_list, n):
+    # Sum of everything nedded for a and b
+    sum_X = sum(x_list)
+    sum_Y = sum(y_list)
+    sum_XX = sum(x**2 for x in x_list)
+    sum_YY = sum(y**2 for y in y_list)
+    sum_XY = sum(x * y for x, y in zip(x_list, y_list))
+    # For Fit 1 (Y = aX * X + bX)
+    aX = (n * sum_XY - sum_X * sum_Y) / (n * sum_XX - sum_X * sum_X)
+    bX = (sum_Y * sum_XX - sum_X * sum_XY) / (n * sum_XX - sum_X * sum_X)
+    # Final operation to get RMSD
+    RMSD_x = math.sqrt(sum([(y_list[i]-aX*x_list[i]-bX)**2 for i in range(n)]) / n)
+    return RMSD_x, aX, bX
+
+def calculate_RMSD_Y(x_list, y_list, n):
+    # Sum of everything nedded for a and b
+    sum_X = sum(x_list)
+    sum_Y = sum(y_list)
+    sum_XX = sum(x**2 for x in x_list)
+    sum_YY = sum(y**2 for y in y_list)
+    sum_XY = sum(x * y for x, y in zip(x_list, y_list))
+    # For Fit 2 (X = aY * Y + bY)
+    aY = (n * sum_XY - sum_X * sum_Y) / (n * sum_YY - sum_Y * sum_Y)
+    bY = (sum_X * sum_YY - sum_Y * sum_XY) / (n * sum_YY - sum_Y * sum_Y)
+    # Final operation to get RMSD
+    RMSD_y = math.sqrt(sum([(y_list[i]-(x_list[i]-bY)/aY)**2 for i in range(n)]) / n)
+    return RMSD_y, aY, bY
+
+def calculate_correlation(X, Y):
+    # Step 1: Calculate the means
+    mean_X = sum(X) / len(X)
+    mean_Y = sum(Y) / len(Y)
+
+    # Step 2: Calculate deviations and products
+    numerator = sum((x - mean_X) * (y - mean_Y) for x, y in zip(X, Y))
+    sum_square_X = sum((x - mean_X) ** 2 for x in X)
+    sum_square_Y = sum((y - mean_Y) ** 2 for y in Y)
+
+    # Step 3: Calculate r
+    denominator = (sum_square_X * sum_square_Y) ** 0.5
+    r = numerator / denominator if denominator != 0 else 0
+
+    return r
+
+def main():
+    argc = len(sys.argv)
+    if argc < 2:
+        return 84
+    if sys.argv[1] == "-h":
+        print("Usage: python script.py <Country Code>")
+        return 84
+
+    buffer = parser()
+
+    countries = []
+    y_list = []
+    x_list = [int(i) for i in list(buffer[1].keys())[2:]]
+
+    for arg in sys.argv[1:]:
+        arg_found = False
+        for row in buffer[1:]:
+            if row["Country Code"] == arg:
+                countries.append(row["Country Name"])
+                current_y_list = [int(i) * 0.000001 for i in list(row.values())[2:]]
+                if len(y_list) == 0:
+                    y_list = current_y_list
+                else:
+                    y_list = [a + b for a, b in zip(y_list, current_y_list)]
+                arg_found = True
+                break
+        if not arg_found:
+            exit(84)
+    countries.sort()
+
+    print(f"Country: {", ".join(countries)}")
+    n = len(x_list)
+    RMSD_x, aX, bX = calculate_RMSD_X(x_list, y_list, n)
+    RMSD_y, aY, bY = calculate_RMSD_Y(x_list, y_list, n)
+
+    x = 2050
+    Y_estim = (aX * x) + bX
+    X_estim = (x - bY) / aY
+
+    Correlation = calculate_correlation(x_list, y_list)
+
+
+    print(
+        f"Fit 1\n"
+        f"    Y = {aX:.2f} X {'+' if bX >= 0 else '-'} {abs(bX):.2f}\n"
+        f"    Root-mean-square deviation: {RMSD_x:.2f}\n"
+        f"    Population in 2050: {Y_estim:.2f}"
+    )
+
+    print(
+        f"Fit 2\n"
+        f"    Y = {aY:.2f} X {'+' if bY >= 0 else '-'} {abs(bY):.2f}\n"
+        f"    Root-mean-square deviation: {RMSD_y:.2f}\n"
+        f"    Population in 2050: {X_estim:.2f}"
+    )
+
+    print(f"Correlation: {Correlation:.4f}")
+
+if __name__ == "__main__":
+    main()
