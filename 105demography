@@ -84,7 +84,7 @@ def main():
             exit(84)
     countries.sort()
 
-    print(f"Country: {", ".join(countries)}")
+    print(f"Country: {', '.join(countries)}")
     n = len(x_list)
     RMSD_x, aX, bX = calculate_RMSD_X(x_list, y_list, n)
     RMSD_y, aY, bY = calculate_RMSD_Y(x_list, y_list, n)
